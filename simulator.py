@@ -8,3 +8,7 @@ class FakeRobot:
 
     def power_off(self):
         self.state = "OFF"
+
+    def lose_heartbeat(self):
+        if self.state == "NORMAL":
+            self.state = "COMM_LOST"
