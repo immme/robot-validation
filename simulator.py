@@ -5,3 +5,6 @@ class FakeRobot:
 
     def power_on(self):
         self.state = "NORMAL"
+
+    def power_off(self):
+        self.state = "OFF"
