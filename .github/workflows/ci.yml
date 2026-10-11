@@ -1,0 +1,30 @@
+name: CI
+
+# 언제 돌리나: main에 push할 때, 그리고 PR을 열거나 갱신할 때
+# (브랜치 push는 PR이 이미 검사하므로 제외해 같은 검사가 두 번 돌지 않게 한다)
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# CI가 쓰는 GitHub 권한은 코드 읽기만 허용한다
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest # GitHub가 빌려주는 빈 리눅스 컴퓨터
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7 # 내 코드를 받아 온다
+
+      - name: Set up Python
+        uses: actions/setup-python@v7 # 로컬과 같은 Python 3.11을 설치한다
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt # 빈 컴퓨터에는 pytest가 없어서 직접 설치한다
+
+      - name: Run tests
+        run: python -m pytest -q # 로컬과 같은 명령
