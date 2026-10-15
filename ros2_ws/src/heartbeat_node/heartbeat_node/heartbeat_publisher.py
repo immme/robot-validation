@@ -19,10 +19,11 @@ class HeartbeatPublisher(Node):
         # 0.5초마다 send_heartbeat를 불러 달라고 신청만 한다.
         # 실제로 부르는 것은 main의 rclpy.spin이다.
         self.timer = self.create_timer(HEARTBEAT_PERIOD, self.send_heartbeat)
-        self.count = 0  # 0부터 1씩 늘어나는 번호(지금은 받는 쪽이 쓰지 않는다)
+        self.count = 0  # 보낼 때마다 1씩 늘어나는 번호(0부터 시작)
         self.get_logger().info(f"heartbeat_publisher started: {HEARTBEAT_TOPIC} every {HEARTBEAT_PERIOD} s")
 
     def send_heartbeat(self):
+        # 타이머가 부를 때마다 번호 하나를 /heartbeat로 보내고, 다음 번호로 넘어간다.
         msg = Int32()
         msg.data = self.count
         self.heartbeat_pub.publish(msg)
@@ -38,6 +39,7 @@ def main(args=None):
     except (KeyboardInterrupt, ExternalShutdownException):
         pass  # Ctrl+C나 종료 신호로 끝내는 것은 정상 종료다.
     finally:
+        # 끝날 때 노드와 rclpy를 정리한다.
         node.destroy_node()
         rclpy.try_shutdown()
 
