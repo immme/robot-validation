@@ -4,7 +4,7 @@ import subprocess
 from collections import Counter
 from pathlib import Path
 
-# 테스트 결과 파일(JSON)을 만들고, 반복 실행 결과에서 불안정한 테스트를 찾는다.
+# 테스트 결과 파일(JSON)을 만들고, 반복 실행 결과를 판정한다(불안정한 테스트 찾기 · 전부 통과했는지 · pytest가 정상 실행됐는지).
 # pytest와의 연결은 conftest.py가 맡는다.
 
 PROJECT_DIR = Path(__file__).parent
@@ -78,3 +78,22 @@ def find_unstable(runs):
         if len(set(results)) > 1:
             unstable[name] = results
     return unstable
+
+
+# pytest가 정상적으로 실행되고 끝났을 때의 종료코드: 0(실패 없음), 1(실패한 테스트가 있음).
+# 0은 SKIP만 있어도 나오므로 통과 여부는 is_all_passed가 따로 판정한다.
+# 그 밖의 코드는 검증이 제대로 실행되지 못했다는 뜻이다:
+# 2(중단·수집 오류), 3(pytest 내부 오류), 4(pytest 사용법 오류), 5(실행된 테스트 없음)
+NORMAL_EXIT_CODES = (0, 1)
+
+
+def find_bad_exit_codes(exit_codes):
+    # exit_codes: 반복 실행마다 pytest 종료코드를 실행 순서대로 모은 목록. 예) [0, 0, 2]
+    # 정상 범위(0, 1)를 벗어난 실행만 {실행 번호(1부터): 종료코드}로 돌려준다(없으면 빈 dict)
+    return {number: code for number, code in enumerate(exit_codes, start=1) if code not in NORMAL_EXIT_CODES}
+
+
+def is_all_passed(runs):
+    # runs: find_unstable과 같은 형식(실행마다 {테스트 이름: 결과}). 모든 실행에서 테스트가 1개 이상 실행됐고 전부 PASS일 때만 True.
+    # FAIL뿐 아니라 SKIP(검증을 하지 않음)이나 테스트가 하나도 없는 실행도 통과로 보지 않는다. 실행 결과가 하나도 없어도 False
+    return len(runs) > 0 and all(len(run) > 0 and set(run.values()) == {"PASS"} for run in runs)
