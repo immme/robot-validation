@@ -66,3 +66,20 @@ def test_count_is_zero_before_first_heartbeat():
     # 감시자 자체 시험(횟수 세기): heartbeat를 하나도 못 받았으면 0번
     monitor = HeartbeatMonitor(clock=FakeClock().now)
     assert monitor.count_since_first(5.0) == 0
+
+
+def test_last_arrival_is_none_before_first_heartbeat():
+    # 감시자 자체 시험(마지막 수신 시각): heartbeat를 하나도 못 받았으면 None
+    monitor = HeartbeatMonitor(clock=FakeClock().now)
+    assert monitor.last_arrival is None
+
+
+def test_last_arrival_is_latest_heartbeat_time():
+    # 감시자 자체 시험(마지막 수신 시각): 가장 마지막에 도착한 시각을 돌려준다
+    clock = FakeClock()
+    monitor = HeartbeatMonitor(clock=clock.now)
+    monitor.on_heartbeat()  # 준비: 시각 0.0초에 heartbeat
+    clock.advance(1.5)
+    monitor.on_heartbeat()  # 준비: 시각 1.5초에 heartbeat
+    clock.advance(1.0)  # 행동: 그 뒤 1.0초가 더 지나도(2.5초) 마지막 수신 시각은 그대로
+    assert monitor.last_arrival == 1.5  # 기대: 마지막으로 도착한 1.5초
