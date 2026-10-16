@@ -24,6 +24,11 @@ class HeartbeatMonitor:
             return "WAITING"  # 아직 하나도 못 받아서 판정하지 않는다(이 경우는 요구사항에 없음)
         return "NORMAL"
 
+    @property
+    def last_arrival(self):
+        # 마지막 heartbeat가 도착한 시각(아직 하나도 못 받았으면 None). 시험이 "마지막 수신 뒤 몇 초"를 잴 때 쓴다.
+        return self._arrivals[-1] if self._arrivals else None
+
     def on_heartbeat(self):
         # heartbeat가 도착할 때마다 부른다. 도착한 시각을 기록한다.
         # 도착하기 전에 이미 timeout이 지났다면 먼저 끊김으로 굳힌다(끊긴 뒤 복구는 아직 요구사항에 없음).
