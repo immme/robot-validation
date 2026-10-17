@@ -4,7 +4,7 @@ import subprocess
 from collections import Counter
 from pathlib import Path
 
-# 테스트 결과 파일(JSON)을 만들고, 반복 실행 결과를 판정한다(불안정한 테스트 찾기 · 전부 통과했는지 · pytest가 정상 실행됐는지).
+# 테스트 결과 파일(JSON)을 만들고, 반복 실행 결과를 판정한다(불안정한 테스트 찾기 · 전부 통과했는지 · pytest가 정상 실행됐는지 · 요청한 테스트가 실제로 실행됐는지).
 # pytest와의 연결은 conftest.py가 맡는다.
 
 PROJECT_DIR = Path(__file__).parent
@@ -91,6 +91,13 @@ def find_bad_exit_codes(exit_codes):
     # exit_codes: 반복 실행마다 pytest 종료코드를 실행 순서대로 모은 목록. 예) [0, 0, 2]
     # 정상 범위(0, 1)를 벗어난 실행만 {실행 번호(1부터): 종료코드}로 돌려준다(없으면 빈 dict)
     return {number: code for number, code in enumerate(exit_codes, start=1) if code not in NORMAL_EXIT_CODES}
+
+
+def find_runs_without_tests(runs, path_prefix):
+    # runs: find_unstable과 같은 형식(실행마다 {테스트 이름: 결과}). path_prefix: 테스트 이름이 이 글자로 시작하는 테스트를 찾는다(예: "tests/ros2/")
+    # 그런 테스트가 하나도 실행되지 않은 반복만 번호(1부터)의 목록으로 돌려준다(없으면 빈 목록).
+    # --ros2를 요청했는데 ROS2 테스트가 하나도 안 돈 반복처럼, 요청한 검증을 하지 않은 반복을 찾는 데 쓴다
+    return [number for number, run in enumerate(runs, start=1) if not any(name.startswith(path_prefix) for name in run)]
 
 
 def is_all_passed(runs):

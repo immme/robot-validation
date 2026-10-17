@@ -1,6 +1,6 @@
-from result_log import find_bad_exit_codes, find_unstable, is_all_passed
+from result_log import find_bad_exit_codes, find_runs_without_tests, find_unstable, is_all_passed
 
-# 반복 실행 결과를 판정하는 함수(find_unstable · is_all_passed · find_bad_exit_codes)를 확인한다.
+# 반복 실행 결과를 판정하는 함수(find_unstable · is_all_passed · find_bad_exit_codes · find_runs_without_tests)를 확인한다.
 # pytest를 여러 번 실행하지 않고 실행별 결과와 종료코드를 직접 만들어 넣는다.
 
 
@@ -116,3 +116,40 @@ def test_exit_codes_other_than_0_and_1_are_bad():
 
     # 기대: 0·1은 빼고, 비정상 실행만 {실행 번호: 종료코드}로 나온다
     assert bad == {3: 2, 4: 5}
+
+
+def test_every_run_with_ros2_tests_has_none_missing():
+    # 준비: 세 번 모두 기본 테스트와 ROS2 테스트(이름이 tests/ros2/로 시작)가 함께 실행됐다
+    runs = [{"tests/test_comm.py::t1": "PASS", "tests/ros2/test_node_kill.py::t2": "PASS"}] * 3
+
+    # 행동
+    missing = find_runs_without_tests(runs, "tests/ros2/")
+
+    # 기대: ROS2 테스트가 빠진 반복이 없다
+    assert missing == []
+
+
+def test_runs_without_any_ros2_tests_are_all_reported():
+    # 준비: 세 번 모두 기본 테스트만 실행됐다(ROS2 테스트는 하나도 안 돌았다)
+    runs = [{"tests/test_comm.py::t1": "PASS"}] * 3
+
+    # 행동
+    missing = find_runs_without_tests(runs, "tests/ros2/")
+
+    # 기대: 세 번 모두 빠진 반복으로 나온다(번호는 1부터)
+    assert missing == [1, 2, 3]
+
+
+def test_run_without_ros2_tests_is_reported():
+    # 준비: 세 번 반복 중 두 번째 반복에서만 ROS2 테스트(이름이 tests/ros2/로 시작)가 실행되지 않았다
+    runs = [
+        {"tests/test_comm.py::t1": "PASS", "tests/ros2/test_node_kill.py::t2": "PASS"},
+        {"tests/test_comm.py::t1": "PASS"},
+        {"tests/test_comm.py::t1": "PASS", "tests/ros2/test_node_kill.py::t2": "PASS"},
+    ]
+
+    # 행동
+    missing = find_runs_without_tests(runs, "tests/ros2/")
+
+    # 기대: 빠진 반복만 번호로 나온다
+    assert missing == [2]
