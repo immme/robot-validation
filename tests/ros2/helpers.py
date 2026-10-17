@@ -1,6 +1,6 @@
 import time
 
-# tests/ros2 안의 시험들이 함께 쓰는 기다리기 도구
+# tests/ros2 안의 테스트들이 함께 쓰는 기다리기 도구
 
 
 def wait_until(condition, timeout):
@@ -14,5 +14,5 @@ def wait_until(condition, timeout):
 
 
 def sleep_until(target_time):
-    # 진짜 시계(time.monotonic)가 target_time이 될 때까지 기다린다. 이미 지났으면 바로 돌아온다.
+    # 실제 시계(time.monotonic)가 target_time이 될 때까지 기다린다. 이미 지났으면 바로 돌아온다.
     time.sleep(max(0.0, target_time - time.monotonic()))

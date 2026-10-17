@@ -6,8 +6,8 @@ HEARTBEAT_TOPIC = "/heartbeat"
 
 
 class HeartbeatListener(Node):
-    # 시험 도구: /heartbeat를 지켜보다가 메시지가 도착하면 감시자(monitor)에게 "도착했다"고만 알린다.
-    # 시험 대상(heartbeat_publisher)을 불러오지 않는다. 토픽 이름과 메시지 타입만 맞으면 누가 보내든 같다.
+    # 테스트 도구: /heartbeat를 지켜보다가 메시지가 도착하면 감시자(monitor)에게 "도착했다"고만 알린다.
+    # 테스트 대상(heartbeat_publisher)을 불러오지 않는다. 토픽 이름과 메시지 타입만 맞으면 누가 보내든 같다.
     def __init__(self, monitor):
         super().__init__("heartbeat_listener")
         self.monitor = monitor  # 도착을 기록하고 판정하는 감시자(monitor.py)
