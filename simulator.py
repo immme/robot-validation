@@ -8,8 +8,8 @@ HEARTBEAT_TIMEOUT = 3.0
 
 class FakeRobot:
     def __init__(self, clock=time.monotonic):
-        # clock: 현재 시각(초)을 돌려주는 함수. 실제 실행에는 진짜 시계(time.monotonic)를,
-        # 테스트에는 시간을 직접 조작할 수 있는 가짜 시계를 넣는다.
+        # clock: 현재 시각(초)을 돌려주는 함수. 기본값은 실제 시계(time.monotonic)이고,
+        # 테스트에서 시간을 직접 조작하고 싶을 때는 가짜 시계를 넣는다.
         self._clock = clock
         self._state = "OFF"
         self._last_heartbeat = None

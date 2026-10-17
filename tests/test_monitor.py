@@ -52,7 +52,7 @@ def test_monitor_heartbeat_resets_timeout():
 
 
 def test_count_since_first_heartbeat():
-    # 감시자 자체 시험(횟수 세기): 0.5초마다 heartbeat가 오면 첫 도착부터 5초 동안 10번 센다
+    # 감시자 자체 테스트(횟수 세기): 0.5초마다 heartbeat가 오면 첫 도착부터 5초 동안 10번 센다
     clock = FakeClock()
     monitor = HeartbeatMonitor(clock=clock.now)
     monitor.on_heartbeat()  # 준비: 시각 0.0초에 첫 heartbeat
@@ -63,19 +63,19 @@ def test_count_since_first_heartbeat():
 
 
 def test_count_is_zero_before_first_heartbeat():
-    # 감시자 자체 시험(횟수 세기): heartbeat를 하나도 못 받았으면 0번
+    # 감시자 자체 테스트(횟수 세기): heartbeat를 하나도 못 받았으면 0번
     monitor = HeartbeatMonitor(clock=FakeClock().now)
     assert monitor.count_since_first(5.0) == 0
 
 
 def test_last_arrival_is_none_before_first_heartbeat():
-    # 감시자 자체 시험(마지막 수신 시각): heartbeat를 하나도 못 받았으면 None
+    # 감시자 자체 테스트(마지막 수신 시각): heartbeat를 하나도 못 받았으면 None
     monitor = HeartbeatMonitor(clock=FakeClock().now)
     assert monitor.last_arrival is None
 
 
 def test_last_arrival_is_latest_heartbeat_time():
-    # 감시자 자체 시험(마지막 수신 시각): 가장 마지막에 도착한 시각을 돌려준다
+    # 감시자 자체 테스트(마지막 수신 시각): 가장 마지막에 도착한 시각을 돌려준다
     clock = FakeClock()
     monitor = HeartbeatMonitor(clock=clock.now)
     monitor.on_heartbeat()  # 준비: 시각 0.0초에 heartbeat

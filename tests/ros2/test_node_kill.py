@@ -4,7 +4,7 @@ import time
 
 from helpers import sleep_until, wait_until
 
-# TC-COM-005 Node Kill Then Timeout (REQ-COM-004): 진짜 heartbeat 노드가 예고 없이 사라지면(kill -9),
+# TC-COM-005 Node Kill Then Timeout (REQ-COM-004): 실제로 실행하는 heartbeat 노드가 예고 없이 사라지면(kill -9),
 # 마지막 heartbeat를 받은 뒤 2.5초 시점은 정상이고 3.5초 시점은 통신 끊김이다.
 # 딱 3.0초 경계는 TC-COM-006이 가짜 시계로 확인한다. 기대값은 요구사항에서 정했고 monitor 코드에서 가져오지 않는다.
 BEFORE_LIMIT = 2.5  # 마지막 수신 뒤 이 시간(초)에는 아직 정상
